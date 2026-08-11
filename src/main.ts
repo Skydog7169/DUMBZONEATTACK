@@ -108,13 +108,17 @@ function update(): void {
       return;
     case "results":
       if (pressed("attack") && G.selCooldown === 0) {
-        if (G.stageIdx >= STAGES.length - 1) { setScene("win"); SFX.win(); }
+        if (G.stageIdx >= STAGES.length - 1) {
+          setScene("win"); SFX.win();
+          G.selCooldown = 90;   // nobody mashes past the victory screen
+        }
         else { G.stageIdx++; setScene("stagecard"); }
       }
       return;
     case "win":
       if (pressed("attack") && G.selCooldown === 0) {
         G.player = null; G.stageIdx = 1; setScene("title"); musicSet("none");
+        G.selCooldown = 60;   // and take a breath before starting a new run
       }
       return;
     case "lose":
@@ -158,7 +162,7 @@ function update(): void {
   // stage clear -> sting -> results
   if (G.clearT > 0) {
     G.clearT--;
-    if (G.clearT === 0) setScene("results");
+    if (G.clearT === 0) { setScene("results"); G.selCooldown = 45; }
   } else if (stageCleared() && p && p.hp > 0) {
     G.clearT = 110;
     SFX.sting();
