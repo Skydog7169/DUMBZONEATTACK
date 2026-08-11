@@ -7,7 +7,7 @@ export type CharKey = "blake" | "jake" | "dan";
 
 export type EnemyKind =
   | "lawyer" | "lawsuit" | "processServer" | "suit" | "pitBoss"
-  | "cardSharp" | "groupChat"
+  | "cardSharp" | "groupChat" | "evilGm"
   | "seniorPartner" | "angelo" | "sonInLaw" | "matriarch" | "catman";
 
 /* ---- canvas / world ---- */
@@ -85,6 +85,7 @@ export const ENEMY: Record<EnemyKind, EnemyStats> = {
   pitBoss:       { hp: 80,  dmg: 12, speed: 1.2, score: 350 },
   cardSharp:     { hp: 28,  dmg: 8,  speed: 1.8, score: 250 },
   groupChat:     { hp: 10,  dmg: 2,  speed: 2.6, score: 400 },
+  evilGm:        { hp: 40,  dmg: 12, speed: 1.7, score: 250 },
   seniorPartner: { hp: 260, dmg: 11, speed: 1.4, score: 1500 },
   angelo:        { hp: 280, dmg: 12, speed: 1.25, score: 1500 },
   sonInLaw:      { hp: 320, dmg: 13, speed: 2.6, score: 2500 },

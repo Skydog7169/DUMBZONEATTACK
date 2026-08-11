@@ -28,10 +28,10 @@ export const isBoss = (e: Enemy): boolean => BOSSES.has(e.kind);
 export function hitEnemy(e: Enemy, dmg: number, o: HitOpts): boolean {
   if (e.hp <= 0 || e.state === "down" || e.state === "grabbed") return false;
 
-  // THE TRADE — the Son-in-Law swaps in a grunt to eat the hit.
+  // THE TRADE — Patty D. throws his Evil GM in to eat the hit.
   if (e.kind === "sonInLaw" && e.tradeCd === 0 && e.spawnGraceT <= 0) {
     e.tradeCd = ENEMY_AI.silTradeCd;
-    const patsy = makeEnemy("lawyer", e.x, e.y);
+    const patsy = makeEnemy("evilGm", e.x, e.y);
     patsy.face = e.face;
     G.enemies.push(patsy);
     const p = G.player;

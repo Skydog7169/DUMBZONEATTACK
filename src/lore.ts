@@ -87,9 +87,10 @@ export const LORE = {
     pitBoss: "PIT BOSS",
     cardSharp: "CARD SHARP",
     groupChat: "THE GROUP CHAT",
+    evilGm: "EVIL GM",         // LORE SLOT: the guy Patty D. throws at you in The Trade
     seniorPartner: "THE SENIOR PARTNER",
     angelo: "ANGELO",
-    sonInLaw: "THE SON-IN-LAW",
+    sonInLaw: "PATTY D.",
     matriarch: "THE MATRIARCH",
     catman: "THE CAT MAN"
   } satisfies Record<EnemyKind, string>,
@@ -123,10 +124,10 @@ export const LORE = {
   },
 
   sonInLaw: {
-    // LORE SLOT: display name + defeat line for THE SON-IN-LAW
+    // LORE SLOT: display name + defeat line for PATTY D.
     // (parody archetype: the corporate heir who took over the local
     //  franchise and traded away the superstar)
-    intro: "MINI-BOSS: THE SON-IN-LAW",
+    intro: "MINI-BOSS: PATTY D.",
     sub: "he had to make the trade",
     tradePop: "TRADED!",
     attackLines: ["IT'S A PROCESS!", "TRUST THE VISION!", "IN FIVE YEARS YOU'LL GET IT!"],

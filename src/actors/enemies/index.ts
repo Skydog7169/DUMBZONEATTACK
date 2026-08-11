@@ -24,6 +24,7 @@ import { STAGES } from "../../stages";
 function dispatch(e: Enemy): void {
   switch (e.kind) {
     case "lawyer": updateLawyer(e); break;
+    case "evilGm": updateLawyer(e); break;   // same melee brain, worse decisions
     case "lawsuit": updateLawsuit(e); break;
     case "processServer": updateProcessServer(e); break;
     case "suit": case "pitBoss": updateSuit(e); break;

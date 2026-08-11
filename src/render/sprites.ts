@@ -215,6 +215,7 @@ export function drawEnemySprite(e: Enemy): void {
       e.kind === "sonInLaw" ? "#2b4fa0" :
       e.kind === "matriarch" ? "#6a2a5a" :
       e.kind === "suit" ? "#5a6270" :
+      e.kind === "evilGm" ? "#1d3f8f" :
       e.kind === "pitBoss" ? "#7a1f2b" : "#23283b";
     lying(e, bodyColor);
     return;
@@ -227,6 +228,17 @@ export function drawEnemySprite(e: Enemy): void {
         skin: "#e0b090", shirt: "#23283b", pants: "#181c2b", hair: "#333",
         tie: "#c02040", w: 26, h: 58, shadowAt: e.y
       });
+      break;
+    case "evilGm":
+      // the front-office hatchet man: shaved head, franchise-blue quarter-zip
+      drawHumanoid(sx, sy, {
+        face: e.face, walk: e.walk, swing: e.swing, hurt,
+        skin: "#8a5a3c", shirt: "#1d3f8f", pants: "#22262e", hair: "#8a5a3c",
+        bald: true, goatee: "#241408", w: 27, h: 60, shadowAt: e.y
+      });
+      // credential lanyard — he IS allowed in the building
+      px(sx - 1, sy - 44, 3, 8, "#d8d8e0");
+      px(sx - 3, sy - 36, 7, 9, "#f0f0f4");
       break;
     case "lawsuit": {
       const diving = e.windupKind === 2;
@@ -398,6 +410,7 @@ export function drawCorpse(c: Corpse): void {
       c.kind === "sonInLaw" ? "#2b4fa0" :
       c.kind === "matriarch" ? "#6a2a5a" :
       c.kind === "pitBoss" ? "#7a1f2b" :
+      c.kind === "evilGm" ? "#1d3f8f" :
       c.kind === "suit" ? "#5a6270" : "#23283b";
     px(sx - 24, c.y - 12, 48, 10, col);
     px(sx + (c.face > 0 ? 20 : -30), c.y - 14, 10, 10, "#e0b090");
