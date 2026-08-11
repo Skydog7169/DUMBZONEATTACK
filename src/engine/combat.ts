@@ -21,7 +21,7 @@ export interface HitOpts {
   silent?: boolean;
 }
 
-const BOSSES = new Set(["angelo", "sonInLaw", "matriarch", "catman"]);
+const BOSSES = new Set(["seniorPartner", "angelo", "sonInLaw", "matriarch", "catman"]);
 export const isBoss = (e: Enemy): boolean => BOSSES.has(e.kind);
 
 /** Returns true if the hit connected (false: blocked, traded, or immune). */

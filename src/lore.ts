@@ -87,6 +87,7 @@ export const LORE = {
     pitBoss: "PIT BOSS",
     cardSharp: "CARD SHARP",
     groupChat: "THE GROUP CHAT",
+    seniorPartner: "THE SENIOR PARTNER",
     angelo: "ANGELO",
     sonInLaw: "THE SON-IN-LAW",
     matriarch: "THE MATRIARCH",
@@ -98,6 +99,15 @@ export const LORE = {
   groupChatSmash: "LEFT ON READ",
 
   /* ---------------- BOSSES ---------------- */
+  seniorPartner: {
+    // LORE SLOT: display name + lines for the Fox 4 house lawyer
+    intro: "MINI-BOSS: THE SENIOR PARTNER",
+    sub: "the firm bills by the punch",
+    enrage: "BILLABLE HOURS!",
+    attackLines: ["OBJECTION!", "SEE YOU IN COURT!", "CEASE AND DESIST!"],
+    defeatLine: "this... is going on your invoice"
+  },
+
   angelo: {
     intro: "MINI-BOSS: ANGELO",
     sub: "a friend in need... constantly",

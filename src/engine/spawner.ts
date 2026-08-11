@@ -39,12 +39,13 @@ export function makeEnemy(kind: EnemyKind, x: number, y?: number): Enemy {
 }
 
 const BOSS_INTROS: Partial<Record<EnemyKind, { intro: string; sub: string }>> = {
-  angelo: LORE.angelo, sonInLaw: LORE.sonInLaw, matriarch: LORE.matriarch, catman: LORE.catman
+  seniorPartner: LORE.seniorPartner, angelo: LORE.angelo,
+  sonInLaw: LORE.sonInLaw, matriarch: LORE.matriarch, catman: LORE.catman
 };
 
 export function spawnEnemy(kind: EnemyKind, x: number, y?: number): Enemy {
   const e = makeEnemy(kind, x, y);
-  if (kind === "angelo" || kind === "sonInLaw" || kind === "matriarch" || kind === "catman") {
+  if (kind === "seniorPartner" || kind === "angelo" || kind === "sonInLaw" || kind === "matriarch" || kind === "catman") {
     e.y = (FLOOR_TOP + FLOOR_BOT) / 2;
     G.bossBar = { ref: e, label: LORE.enemyNames[kind] };
     const b = BOSS_INTROS[kind];

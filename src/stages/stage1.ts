@@ -1,6 +1,6 @@
 /* STAGE 1 — AMBUSH AT FOX 4
    Interior: studio -> hallway -> lobby -> out the front doors.
-   ON AIR gag fires at onAirX. Angelo waits near the exit. */
+   ON AIR gag fires at onAirX. The Senior Partner guards the exit. */
 import type { StageDef } from "../engine/entity";
 import { LORE } from "../lore";
 
@@ -14,6 +14,6 @@ export const stage1: StageDef = {
     { at: 1000, spawn: [["lawyer", 1], ["processServer", 2]], banner: LORE.waveBanners.served },
     { at: 1650, spawn: [["lawyer", 2], ["processServer", 1]], banner: null },
     { at: 2250, spawn: [["lawyer", 2], ["processServer", 2]], banner: LORE.waveBanners.legal },
-    { at: 2950, spawn: [["angelo", 1]], banner: null }
+    { at: 2950, spawn: [["seniorPartner", 1]], banner: null }
   ]
 };

@@ -14,6 +14,7 @@ import { updateProcessServer } from "./processServer";
 import { updateSuit } from "./suit";
 import { updateCardSharp } from "./cardSharp";
 import { updateGroupChat } from "./groupChat";
+import { updateSeniorPartner } from "../bosses/seniorPartner";
 import { updateAngelo } from "../bosses/angelo";
 import { updateSonInLaw } from "../bosses/sonInLaw";
 import { updateMatriarch } from "../bosses/matriarch";
@@ -28,6 +29,7 @@ function dispatch(e: Enemy): void {
     case "suit": case "pitBoss": updateSuit(e); break;
     case "cardSharp": updateCardSharp(e); break;
     case "groupChat": updateGroupChat(e); break;
+    case "seniorPartner": updateSeniorPartner(e); break;
     case "angelo": updateAngelo(e); break;
     case "sonInLaw": updateSonInLaw(e); break;
     case "matriarch": updateMatriarch(e); break;
@@ -152,7 +154,12 @@ function finishEnemy(e: Enemy): void {
 
   G.corpses.push({ x: e.x, y: e.y, kind: e.kind, t: 60, face: e.face });
 
-  if (e.kind === "angelo") {
+  if (e.kind === "seniorPartner") {
+    floatText(e.x, e.y - 100, LORE.seniorPartner.defeatLine, "#fff", 15, 130);
+    G.pickups.push({ kind: "pizza", x: e.x, y: e.y, t: 0 });
+    G.bossBar = null;
+    musicSet(`stage${G.stageIdx + 1}` as "stage1");
+  } else if (e.kind === "angelo") {
     floatText(e.x, e.y - 100, LORE.angelo.defeatLine, "#fff", 15, 130);
     G.pickups.push({ kind: "pizza", x: e.x - 22, y: e.y, t: 0 });
     G.pickups.push({ kind: "peptide", x: e.x + 26, y: e.y, t: 0 });

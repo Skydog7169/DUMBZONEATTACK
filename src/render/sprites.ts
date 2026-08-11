@@ -198,6 +198,7 @@ export function drawEnemySprite(e: Enemy): void {
     const bodyColor =
       e.kind === "catman" ? "#efefe8" :
       e.kind === "angelo" ? "#6b5a3a" :
+      e.kind === "seniorPartner" ? "#1e2a4a" :
       e.kind === "sonInLaw" ? "#2b4fa0" :
       e.kind === "matriarch" ? "#6a2a5a" :
       e.kind === "suit" ? "#5a6270" :
@@ -285,6 +286,19 @@ export function drawEnemySprite(e: Enemy): void {
       }
       break;
     }
+    case "seniorPartner":
+      // silver hair, pinstripe navy, gold tie, briefcase — the closer
+      drawHumanoid(sx, sy, {
+        face: e.face, walk: e.walk, swing: e.swing, hurt, brief: true,
+        skin: "#e2b494", shirt: "#1e2a4a", pants: "#16203a", hair: "#c8c8cc",
+        tie: "#c9a227", w: 32, h: 64, shadowAt: e.y
+      });
+      // pinstripes + pocket square
+      if (e.state !== "hurt") {
+        px(sx - 8, sy - 44, 1, 20, "#3a4a6e"); px(sx + 6, sy - 44, 1, 20, "#3a4a6e");
+        px(sx + e.face * 8 - 2, sy - 42, 5, 3, "#f0ead8");
+      }
+      break;
     case "angelo":
       drawHumanoid(sx, sy, {
         face: e.face, walk: e.walk, swing: e.swing, hurt,
@@ -365,6 +379,7 @@ export function drawCorpse(c: Corpse): void {
     const col =
       c.kind === "catman" ? "#efefe8" :
       c.kind === "angelo" ? "#6b5a3a" :
+      c.kind === "seniorPartner" ? "#1e2a4a" :
       c.kind === "sonInLaw" ? "#2b4fa0" :
       c.kind === "matriarch" ? "#6a2a5a" :
       c.kind === "pitBoss" ? "#7a1f2b" :

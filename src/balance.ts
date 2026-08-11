@@ -8,7 +8,7 @@ export type CharKey = "blake" | "jake" | "dan";
 export type EnemyKind =
   | "lawyer" | "lawsuit" | "processServer" | "suit" | "pitBoss"
   | "cardSharp" | "groupChat"
-  | "angelo" | "sonInLaw" | "matriarch" | "catman";
+  | "seniorPartner" | "angelo" | "sonInLaw" | "matriarch" | "catman";
 
 /* ---- canvas / world ---- */
 export const W = 960, H = 540;
@@ -85,6 +85,7 @@ export const ENEMY: Record<EnemyKind, EnemyStats> = {
   pitBoss:       { hp: 80,  dmg: 12, speed: 1.2, score: 350 },
   cardSharp:     { hp: 28,  dmg: 8,  speed: 1.8, score: 250 },
   groupChat:     { hp: 10,  dmg: 2,  speed: 2.6, score: 400 },
+  seniorPartner: { hp: 260, dmg: 11, speed: 1.4, score: 1500 },
   angelo:        { hp: 280, dmg: 12, speed: 1.25, score: 1500 },
   sonInLaw:      { hp: 320, dmg: 13, speed: 2.6, score: 2500 },
   matriarch:     { hp: 320, dmg: 10, speed: 0.8, score: 3500 },
@@ -98,6 +99,7 @@ export const ENEMY_AI = {
   pitBossBreakStun: 40,
   sharpFireCd: 130, cardVx: 5.5, cardSpread: 1.1,
   chatOrbitR: 105, chatFireCd: 110, chatSlowT: 60, chatSlowMul: 0.6, chatMsgVx: 4.5,
+  partnerReach: 62, partnerSwingCd: 64, partnerFanCd: 180, partnerP2SpeedMul: 1.3,
   angeloGrabCd: 110, angeloReach: 60, angeloHeal: 10, angeloAskCd: 240,
   angeloP2SpeedMul: 1.5, angeloP2GrabCd: 80, angeloP2AskCd: 140,
   silSwingCd: 55, silReach: 62, silTradeCd: 300, silTradeDist: 150,
