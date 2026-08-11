@@ -69,13 +69,23 @@ export function updateMatriarch(e: Enemy): void {
 
   const dx = faceThePlayer(e);
   const dist = Math.abs(dx);
+  const onScreen = e.x > G.cam + 20 && e.x < G.cam + W - 20;
+
+  // her entrance: march well onto the floor once, then hold court
+  // (dashT doubles as the "entrance complete" flag — she never dashes)
+  if (e.dashT === 0) {
+    if (e.x > G.cam + W - 170 || e.x < G.cam + 30) {
+      moveToward(e, p.x, p.y, effSpeed(e) * 2.4);
+      return;
+    }
+    e.dashT = 1;
+  }
 
   // she keeps her distance — but the house never leaves the floor
   if (dist < 170) { e.x = clamp(e.x - sign(dx) * effSpeed(e), G.cam + 46, G.cam + W - 46); e.walk += 0.15; }
   else if (Math.abs(p.y - e.y) > 24) moveToward(e, e.x, p.y, effSpeed(e) * 0.7);
 
   // lobbed exploding poker chip (only while on the floor, no off-screen sniping)
-  const onScreen = e.x > G.cam + 20 && e.x < G.cam + W - 20;
   if (e.throwT > 0) e.throwT--;
   else if (e.spawnGraceT <= 0 && onScreen) {
     e.throwT = ENEMY_AI.matChipCd;

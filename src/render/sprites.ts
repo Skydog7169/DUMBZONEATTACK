@@ -34,6 +34,8 @@ export interface HumanoidOpts {
   brief?: boolean; visor?: string; rolled?: boolean; tattoo?: string;
   dress?: string; cat?: boolean; block?: boolean; cap?: string; bald?: boolean;
   stubble?: string; mustache?: string;
+  longHair?: string;  // shoulder-length falls + bangs across the forehead
+  glasses?: string;   // large tinted lenses instead of eyes
   kick?: number;   // frames of the heavy kick anim
   upper?: number;  // frames of the launcher uppercut anim
   shadowAt?: number; alpha?: number;
@@ -114,6 +116,11 @@ export function drawHumanoid(sx: number, sy: number, o: HumanoidOpts): void {
   if (o.bald) {
     px(sx - w * 0.3, top - 2, w * 0.6, 4, o.skin);            // smooth dome
     px(sx - w * 0.08, top - 1, w * 0.16, 2, "#fff");          // the shine
+  } else if (o.longHair) {
+    px(sx - w * 0.3, top - 4, w * 0.6, 8, o.longHair);        // crown
+    px(sx - w * 0.3, top + 3, w * 0.6, 4, o.longHair);        // bangs
+    px(sx - w * 0.44, top - 2, w * 0.15, h * 0.36, o.longHair); // side falls
+    px(sx + w * 0.29, top - 2, w * 0.15, h * 0.36, o.longHair);
   } else {
     px(sx - w * 0.3, top - 3, w * 0.6, 7, o.hair);
   }
@@ -123,7 +130,13 @@ export function drawHumanoid(sx: number, sy: number, o: HumanoidOpts): void {
   if (o.mustache) px(sx + f * 3 - 6, top + 11, 12, 3, o.mustache);
   if (o.hat) { px(sx - w * 0.36, top - 8, w * 0.72, 8, o.hat); px(sx - w * 0.2, top - 14, w * 0.4, 7, o.hat); }
   if (o.cap) { px(sx - w * 0.32, top - 6, w * 0.64, 7, o.cap); px(sx + f * w * 0.2, top - 3, w * 0.28, 4, o.cap); }
-  if (o.visor) px(sx + f * 6 - 8, top + 6, 16, 5, o.visor);
+  if (o.glasses) {
+    // big tinted lenses with a thin bridge and a glint
+    px(sx + f * 2 - 5, top + 7, 7, 6, o.glasses);
+    px(sx + f * 9 - 4, top + 7, 7, 6, o.glasses);
+    px(sx + f * 5 - 2, top + 8, 3, 2, o.glasses);
+    px(sx + f * 3 - 4, top + 8, 2, 2, "#fff");
+  } else if (o.visor) px(sx + f * 6 - 8, top + 6, 16, 5, o.visor);
   else {
     px(sx + f * 3 - 2, top + 7, 3, 3, "#111");
     px(sx + f * 9 - 2, top + 7, 3, 3, "#111");
@@ -321,9 +334,11 @@ export function drawEnemySprite(e: Enemy): void {
       });
       break;
     case "matriarch":
+      // long blond hair, bangs, big red-tinted glasses
       drawHumanoid(sx, sy, {
         face: e.face, walk: e.walk, swing: e.swing, hurt,
-        skin: "#e5c2a2", shirt: "#6a2a5a", pants: "#4a1e40", hair: "#d8d8d8",
+        skin: "#e5c2a2", shirt: "#6a2a5a", pants: "#4a1e40", hair: "#e8c86a",
+        longHair: "#e8c86a", glasses: "#e04858",
         dress: "#4a1e40", w: 30, h: 60, shadowAt: e.y
       });
       // gold necklace
