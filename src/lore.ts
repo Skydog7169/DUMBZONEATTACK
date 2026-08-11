@@ -91,7 +91,7 @@ export const LORE = {
     seniorPartner: "THE SENIOR PARTNER",
     angelo: "ANGELO",
     sonInLaw: "PATTY D.",
-    matriarch: "THE MATRIARCH",
+    matriarch: "MIRI ODDS-ELSON",   // LORE SLOT: the casino matriarch's stage name
     catman: "THE CAT MAN"
   } satisfies Record<EnemyKind, string>,
 
@@ -135,9 +135,9 @@ export const LORE = {
   },
 
   matriarch: {
-    // LORE SLOT: display name + defeat line for THE MATRIARCH
+    // LORE SLOT: display name + defeat line for the casino matriarch
     // (parody archetype: the casino magnate bankrolling all of this)
-    intro: "MAJOR BOSS: THE MATRIARCH",
+    intro: "MAJOR BOSS: MIRI ODDS-ELSON",
     sub: "the bank behind the villains",
     rainPop: "HOUSE ALWAYS WINS!",
     attackLines: ["THE HOUSE THANKS YOU.", "CASH OUT, BOYS.", "TABLE'S CLOSED."],
