@@ -50,9 +50,11 @@ export function updateProjectiles(): void {
       continue;
     }
 
-    /* direct hits */
+    /* direct hits — cards are small and honest about it */
+    const hitW = pr.type === "card" ? 13 : 24;
+    const hitD = pr.type === "card" ? 13 : 22;
     if (pr.from === "enemy" && p && p.hurtT <= 0 && G.scene === "play") {
-      if (Math.abs(pr.x - p.x) < 24 && Math.abs(pr.y - p.y) < 22 && pr.h < 62) {
+      if (Math.abs(pr.x - p.x) < hitW && Math.abs(pr.y - p.y) < hitD && pr.h < 62) {
         if (pr.type === "textMsg") {
           // the group chat slows you down but never hard-stuns
           p.slowT = ENEMY_AI.chatSlowT;

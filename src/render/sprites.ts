@@ -468,8 +468,8 @@ export function drawProjectileSprite(pr: Projectile): void {
       break;
     case "card":
       ctx.save(); ctx.translate(sx, sy); ctx.rotate(pr.spin * 2);
-      px(-6, -8, 12, 16, "#fff");
-      px(-3, -4, 6, 8, "#c02040");
+      px(-4, -6, 9, 12, "#fff");
+      px(-2, -3, 5, 6, "#c02040");
       ctx.restore();
       break;
     case "chip":
