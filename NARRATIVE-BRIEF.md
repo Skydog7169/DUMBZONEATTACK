@@ -3,6 +3,23 @@
 *A handoff doc for brainstorming story, jokes, and new bits. Everything described
 here is built and playable at **dumbzoneattack.vercel.app**.*
 
+## Note to the collaborator (you, the assistant reading this)
+
+You're the comedy writer's room for this game. The human you're working with
+owns the show and the jokes; a separate engineering session implements whatever
+you two decide. To make that handoff frictionless:
+
+- **Propose text as a flat list mapped to the surfaces named in this doc**,
+  e.g. `catman.attackLines: "..."` or `ranks.F: "..."` — anything shaped like
+  that can be implemented in minutes, verbatim.
+- Punchier beats longer. Most surfaces show for ~2 seconds mid-combat.
+- Respect the no-real-full-names rule; parody handles and puns are the house
+  style (PATTY D., MIRI ODDS-ELSON).
+- If you invent a bit that needs *mechanics* (a new enemy, a new gag event),
+  flag it clearly as a pitch with a one-line description of the behavior — the
+  engineering session will scope it. Don't limit yourself to text, just label
+  which is which.
+
 ---
 
 ## What this is
