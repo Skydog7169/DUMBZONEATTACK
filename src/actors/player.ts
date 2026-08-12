@@ -30,7 +30,7 @@ export function makePlayer(key: CharKey): Player {
     lastTapDir: 1, lastTapT: -999,
     charging: false, chargeT: 0,
     grabbing: null, grabT: 0,
-    slowT: 0, armorT: 0,
+    slowT: 0, armorT: 0, attackLockT: 0,
     combo: 0, comboT: 0
   };
 }
@@ -201,12 +201,15 @@ export function updatePlayer(): void {
   if (p.dashAtkCd > 0) p.dashAtkCd--;
   if (p.slowT > 0) p.slowT--;
   if (p.armorT > 0) p.armorT--;
+  if (p.attackLockT > 0) p.attackLockT--;
   if (p.comboT > 0) p.comboT--; else p.combo = 0;
 
-  // buffered inputs (6 frames per brief)
-  if (pressed("attack")) { p.bufAct = "attack"; p.bufT = COMBAT.inputBuffer; }
-  else if (pressed("strong")) { p.bufAct = "strong"; p.bufT = COMBAT.inputBuffer; }
-  else if (pressed("special")) { p.bufAct = "special"; p.bufT = COMBAT.inputBuffer; }
+  // buffered inputs (6 frames per brief) — an INJUNCTION voids them
+  if (p.attackLockT <= 0) {
+    if (pressed("attack")) { p.bufAct = "attack"; p.bufT = COMBAT.inputBuffer; }
+    else if (pressed("strong")) { p.bufAct = "strong"; p.bufT = COMBAT.inputBuffer; }
+    else if (pressed("special")) { p.bufAct = "special"; p.bufT = COMBAT.inputBuffer; }
+  }
 
   // double-tap dash detection
   for (const dir of [-1, 1] as Facing[]) {

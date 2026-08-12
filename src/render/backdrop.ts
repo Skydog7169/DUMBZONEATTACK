@@ -40,8 +40,11 @@ export function drawBackdrop(): void {
   switch (STAGES[G.stageIdx].backdrop) {
     case 0: drawStudio(); break;
     case 1: drawDowntown(); break;
-    case 2: drawPenthouse(); break;
+    case 2: drawEstate(); break;
     case 3: drawRooftop(); break;
+    case 4: drawAAC(); break;
+    case 5: drawLimeRoad(); break;
+    case 6: drawCumulus(); break;
   }
 }
 
@@ -95,10 +98,11 @@ function drawStudio(): void {
     if (sx > -120 && sx < W + 120) {
       const lit = G.onAirDone && G.onAirT > 0 ? G.tick % 8 < 5 : G.onAirDone;
       const preFlicker = !G.onAirDone && G.tick % 90 > 84;
-      ctx.fillStyle = "#22201c"; ctx.fillRect(sx - 52, 58, 104, 36);
+      const wide = G.onAirLabel.length > 8;
+      ctx.fillStyle = "#22201c"; ctx.fillRect(sx - (wide ? 92 : 52), 58, wide ? 184 : 104, 36);
       ctx.fillStyle = lit || preFlicker ? "#ff2222" : "#4a1111";
-      ctx.font = "bold 20px monospace"; ctx.textAlign = "center";
-      ctx.fillText(LORE.onAir, sx, 84);
+      ctx.font = `bold ${wide ? 15 : 20}px monospace`; ctx.textAlign = "center";
+      ctx.fillText(G.onAirLabel, sx, 82);
       if (lit) {
         ctx.fillStyle = "rgba(255,40,40,0.10)";
         ctx.beginPath(); ctx.moveTo(sx - 40, 94); ctx.lineTo(sx - 120, FLOOR_TOP); ctx.lineTo(sx + 120, FLOOR_TOP); ctx.fill();
@@ -278,10 +282,10 @@ function lampPosts(): void {
   }
 }
 
-/* ---------------- Stage 3: elevator + penthouse ---------------- */
-function drawPenthouse(): void {
+/* ---------------- Stage 4: the estate (casino mansion) ---------------- */
+function drawEstate(): void {
   const stage = STAGES[G.stageIdx];
-  const elevEnd = stage.elevatorEndX ?? 0;
+  const elevEnd = stage.interiorX ?? 0;
 
   // gold-and-velvet wall
   const g = ctx.createLinearGradient(0, 0, 0, FLOOR_TOP);
@@ -322,24 +326,274 @@ function drawPenthouse(): void {
   }
   street("#4a3040", "#5c3c50", "#38202e");
 
-  // elevator interior overrides the start of the stage
+  // the family banner, hung proudly in the great hall
+  const bx = 1500 - G.cam;
+  if (bx > -420 && bx < W) {
+    ctx.fillStyle = "#7a1f2b"; ctx.fillRect(bx, 96, 400, 44);
+    ctx.fillStyle = "#e8c66a"; ctx.font = "bold 16px monospace"; ctx.textAlign = "center";
+    ctx.fillText(LORE.matriarch.estateBanner, bx + 200, 124);
+    ctx.fillStyle = "#4a1218";
+    ctx.beginPath(); ctx.moveTo(bx, 140); ctx.lineTo(bx + 24, 158); ctx.lineTo(bx + 48, 140); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(bx + 352, 140); ctx.lineTo(bx + 376, 158); ctx.lineTo(bx + 400, 140); ctx.fill();
+  }
+
+  // the lawn: you crawled out of the wreckage for this
   const ex = elevEnd - G.cam;
   if (ex > 0) {
-    ctx.fillStyle = "#2c2c34"; ctx.fillRect(0, 0, ex, H);
-    ctx.fillStyle = "#44444e";
-    for (let lx = -((G.cam / 2) % 60); lx < ex; lx += 60) ctx.fillRect(lx, 0, 4, FLOOR_TOP);
-    ctx.fillStyle = "#1c1c22"; ctx.fillRect(0, FLOOR_TOP - 40, ex, H - FLOOR_TOP + 40);
-    // floor counter ticking up
-    ctx.fillStyle = "#0a0a0c"; ctx.fillRect(Math.min(ex - 150, 60), 60, 120, 44);
-    ctx.fillStyle = "#ff9d3c"; ctx.font = "bold 24px monospace"; ctx.textAlign = "center";
-    const floor = Math.min(68, 12 + ((G.tick / 40) | 0) % 57);
-    ctx.fillText(String(floor).padStart(2, "0"), Math.min(ex - 90, 120), 92);
-    // door seam
-    ctx.fillStyle = "#d4af37"; ctx.fillRect(ex - 6, 0, 6, H);
+    // night sky over the grounds
+    const sky = ctx.createLinearGradient(0, 0, 0, FLOOR_TOP);
+    sky.addColorStop(0, "#101a30"); sky.addColorStop(1, "#25324e");
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, Math.min(ex, W), FLOOR_TOP);
+    ctx.fillStyle = "#fff";
+    for (let i = 0; i < 16; i++) {
+      const sx2 = (i * 131) % Math.max(1, Math.min(ex, W));
+      ctx.fillRect(sx2, (i * i * 37) % 160, 2, 2);
+    }
+    // hedges + iron gate
+    ctx.fillStyle = "#1c3a24";
+    for (let hx = -((G.cam) % 180); hx < ex; hx += 180) {
+      ctx.beginPath(); ctx.ellipse(hx + 60, 300, 70, 44, 0, 0, 7); ctx.fill();
+    }
+    ctx.strokeStyle = "#222"; ctx.lineWidth = 4;
+    const gx = 60 - G.cam;
+    if (gx > -200) {
+      for (let b = 0; b < 8; b++) {
+        ctx.beginPath(); ctx.moveTo(gx + b * 18, 150); ctx.lineTo(gx + b * 18, 330); ctx.stroke();
+      }
+      ctx.beginPath(); ctx.moveTo(gx - 8, 160); ctx.lineTo(gx + 134, 160); ctx.stroke();
+    }
+    // the wreckage: bent rotor, smoke, a star on the tail
+    const wx = 300 - G.cam;
+    if (wx > -160 && wx < ex + 100) {
+      ctx.save(); ctx.translate(wx, 320); ctx.rotate(0.28);
+      ctx.fillStyle = "#8a95a0";
+      ctx.beginPath(); ctx.ellipse(0, 0, 52, 22, 0, 0, 7); ctx.fill();
+      ctx.fillStyle = "#5a636e"; ctx.fillRect(-92, -12, 46, 9);
+      ctx.strokeStyle = "#6a7580"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(-30, -30); ctx.lineTo(28, -44); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-8, -32); ctx.lineTo(-46, -58); ctx.stroke();
+      ctx.restore();
+      ctx.fillStyle = "rgba(90,90,100,0.35)";
+      for (let s = 0; s < 4; s++) {
+        const st = (G.tick * 0.6 + s * 34) % 130;
+        ctx.beginPath();
+        ctx.ellipse(wx + 10 + Math.sin((G.tick + s * 30) * 0.03) * 10, 290 - st, 12 + st * 0.2, 9 + st * 0.14, 0, 0, 7);
+        ctx.fill();
+      }
+    }
+    // grass strip + marble facade seam
+    ctx.fillStyle = "#24422c"; ctx.fillRect(0, FLOOR_TOP - 40, Math.min(ex, W), H - FLOOR_TOP + 40);
+    ctx.fillStyle = "#e8dcc8"; ctx.fillRect(ex - 10, 0, 10, H);
   }
 }
 
-/* ---------------- Stage 4: rooftop dawn ---------------- */
+/* ---------------- Stage 3: THE AAC ---------------- */
+function drawAAC(): void {
+  const stage = STAGES[G.stageIdx];
+  // upper bowl: dark with crowd dots
+  const g = ctx.createLinearGradient(0, 0, 0, FLOOR_TOP);
+  g.addColorStop(0, "#0c0f1c"); g.addColorStop(1, "#1e2438");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, FLOOR_TOP);
+
+  const concourseEnd = 900, tunnelEnd = 1500;
+  const px0 = G.cam;
+
+  // arena bowl (x > tunnelEnd): crowd, banners, jumbotron
+  ctx.fillStyle = "#2a3050";
+  for (let row = 0; row < 5; row++) {
+    ctx.fillRect(0, 60 + row * 44, W, 30);
+  }
+  // the crowd
+  for (let i = 0; i < 260; i++) {
+    const cx2 = (i * 37 + ((i * i * 11) % 29)) % W;
+    const cy = 64 + (i % 5) * 44 + (i * 13) % 18;
+    ctx.fillStyle = ["#c8a06a", "#8a5a3c", "#e0b090", "#5a6a9a", "#9a4a4a", "#4a7a5a"][i % 6];
+    ctx.fillRect(cx2, cy, 4, 6);
+    if ((i + ((G.tick / 14) | 0)) % 23 === 0) ctx.fillRect(cx2, cy - 4, 4, 4);  // arms up
+  }
+  // championship banners
+  for (let b = 0; b < 4; b++) {
+    const bx = b * 620 - (G.cam * 0.6 % 620) + 140;
+    if (bx < -60 || bx > W) continue;
+    ctx.fillStyle = ["#2b4fa0", "#7a1f2b", "#2b4fa0", "#1e5a46"][b % 4];
+    ctx.beginPath();
+    ctx.moveTo(bx, 0); ctx.lineTo(bx + 54, 0); ctx.lineTo(bx + 44, 74); ctx.lineTo(bx + 27, 92); ctx.lineTo(bx + 10, 74);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "#e8e0c8"; ctx.font = "bold 11px monospace"; ctx.textAlign = "center";
+    ctx.fillText("'11", bx + 27, 40);
+  }
+  // the jumbotron
+  const jx = W / 2 - 130;
+  ctx.fillStyle = "#0a0a10"; ctx.fillRect(jx, 26, 260, 92);
+  ctx.strokeStyle = "#3a4258"; ctx.lineWidth = 4; ctx.strokeRect(jx, 26, 260, 92);
+  ctx.strokeStyle = "#2a3044";
+  ctx.beginPath(); ctx.moveTo(jx + 130, 0); ctx.lineTo(jx + 130, 26); ctx.stroke();
+  if (G.kissCamShowT > 0) {
+    // KISS CAM mode: pink frame + hearts
+    ctx.fillStyle = "#e84878"; ctx.font = "bold 26px monospace"; ctx.textAlign = "center";
+    ctx.fillText(LORE.signage.kissCam, jx + 130, 66);
+    ctx.font = "bold 16px monospace";
+    const heart = G.tick % 20 < 10 ? "♥ ♥ ♥" : "♥   ♥";
+    ctx.fillText(heart, jx + 130, 96);
+    ctx.strokeStyle = "#e84878"; ctx.lineWidth = 3; ctx.strokeRect(jx + 6, 32, 248, 80);
+  } else {
+    const msg = LORE.signage.jumbotron[Math.floor(G.tick / 300) % LORE.signage.jumbotron.length];
+    ctx.fillStyle = "#ff9d3c"; ctx.font = "bold 17px monospace"; ctx.textAlign = "center";
+    ctx.fillText(msg, jx + 130, 62);
+    ctx.fillStyle = "#39d5ff"; ctx.font = "bold 13px monospace";
+    ctx.fillText(`${LORE.chars.blake.name}·${LORE.chars.jake.name}·${LORE.chars.dan.name}  vs  DFW`, jx + 130, 92);
+  }
+  // crowd chant overlay
+  if (G.chantActiveT > 0 && G.tick % 30 < 22) {
+    ctx.fillStyle = "#fff"; ctx.font = "bold 20px monospace"; ctx.textAlign = "center";
+    const off = (G.tick * 3) % 400 - 200;
+    ctx.fillText(LORE.signage.chant, W / 2 + off, 150);
+    ctx.fillText(LORE.signage.chant, W / 2 - off, 200);
+  }
+
+  // concourse / tunnel overlays near the start
+  const cx3 = concourseEnd - px0;
+  if (cx3 > 0) {
+    ctx.fillStyle = "#2e2a38"; ctx.fillRect(0, 0, Math.min(cx3, W), FLOOR_TOP);
+    ctx.fillStyle = "#3c3648";
+    for (let lx = -(px0 % 240); lx < Math.min(cx3, W); lx += 240) {
+      ctx.fillRect(lx, 80, 120, 140);
+      ctx.fillStyle = "#ffd23f"; ctx.font = "bold 12px monospace"; ctx.textAlign = "center";
+      ctx.fillText("§ " + (104 + ((lx + px0) / 240 | 0) % 20), lx + 60, 74);
+      ctx.fillStyle = "#3c3648";
+    }
+  }
+  const tx = tunnelEnd - px0, ts = concourseEnd - px0;
+  if (tx > 0 && ts < W) {
+    ctx.fillStyle = "#14121c";
+    ctx.fillRect(Math.max(0, ts), 0, Math.min(tx, W) - Math.max(0, ts), FLOOR_TOP);
+    ctx.fillStyle = "#2a2636";
+    for (let lx = Math.max(0, ts); lx < Math.min(tx, W); lx += 90) ctx.fillRect(lx, 40, 6, 260);
+  }
+
+  // the hardwood
+  ctx.fillStyle = "#b98a4a"; ctx.fillRect(0, FLOOR_TOP - 40, W, H - FLOOR_TOP + 40);
+  ctx.fillStyle = "#c99a5a"; ctx.fillRect(0, FLOOR_TOP - 40, W, 12);
+  ctx.strokeStyle = "#8a6432"; ctx.lineWidth = 2;
+  for (let i = 0; i < 14; i++) {
+    const lx = (i * 120 - G.cam % 120);
+    ctx.beginPath(); ctx.moveTo(lx, FLOOR_TOP - 28); ctx.lineTo(lx - 60, H); ctx.stroke();
+  }
+  // center-court circle near the boss arena
+  const ccx = stage.length - 450 - G.cam;
+  if (ccx > -300 && ccx < W + 300) {
+    ctx.strokeStyle = "#2b4fa0"; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.ellipse(ccx, 440, 160, 52, 0, 0, 7); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(ccx, 440, 60, 20, 0, 0, 7); ctx.stroke();
+  }
+}
+
+/* ---------------- Stage 5: the Lime ride ---------------- */
+function drawLimeRoad(): void {
+  paintSkyNight();
+  stars();
+  drawSkyline(300, NIGHT, paintSkyNight, 0.15);
+  // shopfront strip above the road
+  ctx.fillStyle = "#1e1828"; ctx.fillRect(0, 240, W, 70);
+  for (let i = 0; i < 8; i++) {
+    const sx = i * 300 - (G.cam * 0.9 % 300);
+    if (sx < -120 || sx > W) continue;
+    ctx.fillStyle = ["#ff4f79", "#39d5ff", "#ffd23f", "#67e06b"][i % 4];
+    ctx.fillRect(sx + 20, 252, 80, 14);
+    ctx.fillStyle = "#3a3048"; ctx.fillRect(sx + 20, 270, 80, 40);
+  }
+  // the road
+  ctx.fillStyle = "#22222a"; ctx.fillRect(0, FLOOR_TOP - 40, W, H - FLOOR_TOP + 40);
+  ctx.fillStyle = "#2e2e38"; ctx.fillRect(0, FLOOR_TOP - 40, W, 10);
+  // lane dashes streaming by
+  ctx.fillStyle = "#c8c84a";
+  for (let lane = 0; lane < 2; lane++) {
+    const ly = 396 + lane * 62;
+    for (let d = 0; d < 12; d++) {
+      const dx2 = (d * 110 - (G.cam * 1.0) % 110);
+      ctx.fillRect(dx2, ly, 46, 5);
+    }
+  }
+  // road signs (from lore)
+  for (let s = 0; s < LORE.signage.roadSigns.length; s++) {
+    const sx = 900 + s * 1600 - G.cam;
+    if (sx < -260 || sx > W + 40) continue;
+    ctx.fillStyle = "#2a2a30"; ctx.fillRect(sx, 180, 8, 130);
+    ctx.fillStyle = "#0f6a38"; ctx.fillRect(sx - 110, 150, 230, 44);
+    ctx.strokeStyle = "#e8e8e8"; ctx.lineWidth = 2; ctx.strokeRect(sx - 110, 150, 230, 44);
+    ctx.fillStyle = "#fff"; ctx.font = "bold 12px monospace"; ctx.textAlign = "center";
+    ctx.fillText(LORE.signage.roadSigns[s], sx + 5, 177);
+  }
+}
+
+/* ---------------- Stage 6: the Cumulus building ---------------- */
+function drawCumulus(): void {
+  const lobbyEnd = 1200, cubesEnd = 2600;
+  const px0 = G.cam;
+  // pre-dawn through the studio-floor windows (default backdrop)
+  const g = ctx.createLinearGradient(0, 0, 0, FLOOR_TOP);
+  g.addColorStop(0, "#241a3e"); g.addColorStop(0.7, "#4e2a52"); g.addColorStop(1, "#8a4460");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, FLOOR_TOP);
+  // window mullions
+  ctx.fillStyle = "#14101c";
+  for (let mx = -(px0 * 0.9 % 220); mx < W; mx += 220) ctx.fillRect(mx, 0, 14, FLOOR_TOP);
+  ctx.fillRect(0, 130, W, 10);
+  // broadcast desk + monitor wall near the end
+  const stage = STAGES[G.stageIdx];
+  const dx2 = stage.length - 520 - px0;
+  if (dx2 > -300 && dx2 < W + 100) {
+    ctx.fillStyle = "#1c1824"; ctx.fillRect(dx2, 140, 260, 120);
+    for (let m = 0; m < 8; m++) {
+      ctx.fillStyle = (m + ((G.tick / 40) | 0)) % 3 === 0 ? "#39d5ff" : "#1a3a4a";
+      ctx.fillRect(dx2 + 12 + (m % 4) * 60, 152 + Math.floor(m / 4) * 52, 48, 40);
+    }
+    ctx.fillStyle = "#3a3444"; ctx.fillRect(dx2 + 20, 276, 220, 46);
+  }
+
+  // cubicle farm overlay
+  const cs = lobbyEnd - px0, ce = cubesEnd - px0;
+  if (ce > 0 && cs < W) {
+    ctx.fillStyle = "#2e2a34";
+    ctx.fillRect(Math.max(0, cs), 0, Math.min(ce, W) - Math.max(0, cs), FLOOR_TOP);
+    for (let cx2 = Math.max(0, cs) + ((px0 + Math.max(0, cs)) % 1 === 0 ? 0 : 0); cx2 < Math.min(ce, W); cx2 += 170) {
+      ctx.fillStyle = "#4a4456"; ctx.fillRect(cx2 + 10, 200, 140, 110);
+      ctx.fillStyle = "#3a3444"; ctx.fillRect(cx2 + 20, 214, 120, 8);
+      ctx.fillStyle = "#1a2a34"; ctx.fillRect(cx2 + 40, 230, 40, 30);   // monitor
+      ctx.fillStyle = (G.tick + cx2) % 90 < 60 ? "#2a5a6a" : "#1a2a34";
+      ctx.fillRect(cx2 + 44, 234, 32, 22);
+      ctx.fillStyle = "#c8c4b8"; ctx.fillRect(cx2 + 96, 236, 26, 18);   // paper stack
+    }
+    // fluorescent gloom
+    ctx.fillStyle = "rgba(210,230,200,0.05)";
+    ctx.fillRect(Math.max(0, cs), 0, Math.min(ce, W) - Math.max(0, cs), FLOOR_TOP);
+  }
+  // marble lobby overlay
+  const le = lobbyEnd - px0;
+  if (le > 0) {
+    ctx.fillStyle = "#3a3640"; ctx.fillRect(0, 0, Math.min(le, W), FLOOR_TOP);
+    ctx.fillStyle = "#4e4858";
+    for (let mx = -(px0 % 200); mx < Math.min(le, W); mx += 200) ctx.fillRect(mx, 60, 34, 290);
+    // the company name over reception
+    const rx = 520 - px0;
+    if (rx > -300 && rx < W) {
+      ctx.fillStyle = "#28242e"; ctx.fillRect(rx, 250, 260, 70);
+      ctx.fillStyle = "#d8d4dc"; ctx.font = "bold 26px monospace"; ctx.textAlign = "center";
+      ctx.fillText(LORE.signage.cumulus, rx + 130, 130);
+      ctx.fillStyle = "#8a8494"; ctx.fillRect(rx + 20, 96, 220, 6);
+    }
+  }
+
+  // carpet
+  ctx.fillStyle = "#2c3038"; ctx.fillRect(0, FLOOR_TOP - 40, W, H - FLOOR_TOP + 40);
+  ctx.fillStyle = "#383e48"; ctx.fillRect(0, FLOOR_TOP - 40, W, 10);
+  ctx.strokeStyle = "#20242c"; ctx.lineWidth = 2;
+  for (let i = 0; i < 14; i++) {
+    const lx = (i * 120 - G.cam % 120);
+    ctx.beginPath(); ctx.moveTo(lx, FLOOR_TOP - 30); ctx.lineTo(lx - 60, H); ctx.stroke();
+  }
+}
+
+/* ---------------- (retired) rooftop dawn ---------------- */
 function drawRooftop(): void {
   paintSkyDawn();
   // rising sun

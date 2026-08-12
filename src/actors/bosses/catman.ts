@@ -31,6 +31,7 @@ export function updateCatman(e: Enemy): void {
     comicCard(LORE.catman.phase2Pop, "#ff9dc0", 0.5);
     collusionSummon();
     e.askT = 600;
+    e.fireT = 300;   // first INJUNCTION comes a beat into the phase
   }
   if (e.phase === 2 && frac < 0.33) {
     e.phase = 3;
@@ -46,6 +47,13 @@ export function updateCatman(e: Enemy): void {
     if (e.askT > 0) e.askT--;
     else if (G.enemies.length < 3 && e.summonCount < 3) {
       e.askT = 720; e.summonCount++; collusionSummon();
+    }
+    // INJUNCTION! — your attacks are enjoined for two seconds
+    if (e.fireT > 0) e.fireT--;
+    else if (e.spawnGraceT <= 0 && p.attackLockT <= 0) {
+      e.fireT = 660;
+      comicCard(LORE.catman.injunctionPop, "#c9c9d4", 0.5);
+      p.attackLockT = 120;
     }
   }
 

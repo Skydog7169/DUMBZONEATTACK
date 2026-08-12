@@ -4,10 +4,10 @@
 import { G, type Enemy } from "../../engine/entity";
 import { COMBAT, SPECIALS, PIZZA_DROP_CHANCE, PEPTIDE_DROP_CHANCE, W, FLOOR_TOP, FLOOR_BOT } from "../../balance";
 import { hitEnemy, isBoss } from "../../engine/combat";
-import { floatText, spark, confetti } from "../../render/fx";
-import { SFX, musicSet } from "../../audio";
+import { floatText, spark, confetti, comicCard } from "../../render/fx";
+import { SFX, musicSet, musicForStage } from "../../audio";
 import { LORE } from "../../lore";
-import { clamp, rnd } from "../../engine/util";
+import { clamp, rnd, pick } from "../../engine/util";
 import { updateLawyer } from "./lawyer";
 import { updateLawsuit } from "./lawsuit";
 import { updateProcessServer } from "./processServer";
@@ -149,7 +149,7 @@ function finishEnemy(e: Enemy): void {
     SFX.smash();
     spark(e.x, e.y - e.h - 20, "#39d5ff", 16, 5);
     spark(e.x, e.y - e.h - 20, "#fff", 10, 4);
-    floatText(e.x, e.y - 96, LORE.groupChatSmash, "#39d5ff", 15, 70);
+    floatText(e.x, e.y - 96, pick(LORE.groupChatSmash), "#39d5ff", 15, 70);
     return; // no corpse — it shattered
   }
 
@@ -159,21 +159,27 @@ function finishEnemy(e: Enemy): void {
     floatText(e.x, e.y - 100, LORE.seniorPartner.defeatLine, "#fff", 15, 130);
     G.pickups.push({ kind: "pizza", x: e.x, y: e.y, t: 0 });
     G.bossBar = null;
-    musicSet(`stage${G.stageIdx + 1}` as "stage1");
+    musicSet(musicForStage(G.stageIdx));
   } else if (e.kind === "angelo") {
-    floatText(e.x, e.y - 100, LORE.angelo.defeatLine, "#fff", 15, 130);
+    if (G.player && G.player.key === "blake") {
+      // THE RAIN CAME TO DALLAS — the secret Blake-only send-off
+      G.pendingBridge = "angeloRain";
+    } else {
+      floatText(e.x, e.y - 100, pick(LORE.angelo.defeatLines), "#fff", 15, 130);
+    }
     G.pickups.push({ kind: "pizza", x: e.x - 22, y: e.y, t: 0 });
     G.pickups.push({ kind: "peptide", x: e.x + 26, y: e.y, t: 0 });
     G.bossBar = null;
-    musicSet(`stage${G.stageIdx + 1}` as "stage1");
+    musicSet(musicForStage(G.stageIdx));
   } else if (e.kind === "sonInLaw") {
     floatText(e.x, e.y - 100, LORE.sonInLaw.defeatLine, "#fff", 15, 130);
     G.bossBar = null;
-    musicSet(`stage${G.stageIdx + 1}` as "stage1");
+    musicSet(musicForStage(G.stageIdx));
   } else if (e.kind === "matriarch") {
     floatText(e.x, e.y - 100, LORE.matriarch.defeatLine, "#fff", 15, 130);
+    comicCard(LORE.matriarch.defeatPop, "#e8c66a", 0.5);   // her death defunds the finale
     G.bossBar = null;
-    musicSet(`stage${G.stageIdx + 1}` as "stage1");
+    musicSet(musicForStage(G.stageIdx));
   } else if (e.kind === "catman") {
     // slow-mo final hit, flash, confetti of shredded contracts, dawn breaks
     floatText(e.x, e.y - 100, LORE.catman.defeatLine, "#fff", 15, 160);

@@ -5,6 +5,7 @@ import { W, ENEMY_AI, SPECIALS } from "../balance";
 import { hurtPlayer } from "./combat";
 import { gooSplat, danBomb } from "../actors/player";
 import { floatText, spark } from "../render/fx";
+import { LORE } from "../lore";
 import { SFX } from "../audio";
 import { clamp } from "./util";
 
@@ -62,6 +63,7 @@ export function updateProjectiles(): void {
           floatText(p.x, p.y - 96, pr.text, "#39d5ff", 14, 55);
         } else {
           hurtPlayer(pr.dmg);
+          if (pr.type === "pinkSlip") floatText(p.x, p.y - 96, LORE.catman.servedPop, "#ff9dc0", 14, 50);
         }
         pr.dead = true;
         continue;

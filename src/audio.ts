@@ -117,6 +117,12 @@ export function musicSet(name: "stage1" | "stage2" | "stage3" | "stage4" | "boss
   current = name === "none" ? null : SONGS[name];
   step = 0; frameCount = 0;
 }
+
+/** which theme each of the six stages uses */
+export function musicForStage(idx: number): "stage1" | "stage2" | "stage3" | "stage4" {
+  const map = ["stage1", "stage2", "stage3", "stage3", "stage2", "stage4"] as const;
+  return map[idx] ?? "stage1";
+}
 export function musicToggleMute(): void { muted = !muted; }
 
 export function musicTick(): void {

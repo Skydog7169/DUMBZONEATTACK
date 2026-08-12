@@ -3,7 +3,10 @@ import { G, type Scene } from "./engine/entity";
 import { W, H, FLOOR_TOP, FLOOR_BOT, ENEMY_AI, CHARS } from "./balance";
 import { cvs, ctx } from "./engine/canvas";
 import { initInput, tickInput, pressed, onFirstInteraction } from "./input";
-import { unlockAudio, SFX, musicSet, musicTick, musicToggleMute } from "./audio";
+import { unlockAudio, SFX, musicSet, musicTick, musicToggleMute, musicForStage } from "./audio";
+import { startBridge, stepBridge, drawBridge, stepOutro, drawOutro } from "./render/panels";
+import { initLimeRide, updateLimeRide, drawLimeHazards, limeRideDone } from "./actors/limeRide";
+import { pick } from "./engine/util";
 import { LORE } from "./lore";
 import { STAGES } from "./stages";
 import { makePlayer, updatePlayer, CHAR_KEYS } from "./actors/player";
@@ -47,15 +50,29 @@ function startStage(idx: number): void {
     p.combo = 0; p.slowT = 0; p.dashT = 0;
   }
   G.cam = 0; G.enemies = []; G.projectiles = []; G.pickups = []; G.clouds = [];
-  G.goos = []; G.streams = []; G.corpses = [];
+  G.goos = []; G.streams = []; G.corpses = []; G.hazards = [];
   G.waveIdx = 0; G.gateX = null; G.bossBar = null;
   G.hitstop = 0; G.shake = 0; G.slowmoT = 0; G.clearT = 0;
   G.onAirDone = false; G.onAirT = 0;
+  G.onAirLabel = pick(LORE.onAirVariants);
+  G.pendingBridge = null; G.bridgeSeq = null; G.outroT = 0;
+  G.kissCamT = 600; G.kissCamShowT = 0;
+  G.chantT = 500; G.chantActiveT = 0;
   G.stats = { damage: 0, maxCombo: 0, startScore: G.score, died: G.stats.died && false };
   clearFx();
-  // a welcome-mat pizza so players learn the pickup
-  G.pickups.push({ kind: "pizza", x: 400, y: (FLOOR_TOP + FLOOR_BOT) / 2, t: 0 });
-  musicSet(`stage${idx + 1}` as "stage1");
+  const def = STAGES[idx];
+  if (def.autoscroll) {
+    initLimeRide();
+  } else {
+    // a welcome-mat pizza so players learn the pickup
+    G.pickups.push({ kind: "pizza", x: 400, y: (FLOOR_TOP + FLOOR_BOT) / 2, t: 0 });
+    // the finale gets a break-room cache before the boss
+    if (idx === STAGES.length - 1) {
+      G.pickups.push({ kind: "pizza", x: 2250, y: 420, t: 0 });
+      G.pickups.push({ kind: "peptide", x: 2320, y: 470, t: 0 });
+    }
+  }
+  musicSet(musicForStage(idx));
   setScene("play");
 }
 
@@ -109,10 +126,28 @@ function update(): void {
     case "results":
       if (pressed("attack") && G.selCooldown === 0) {
         if (G.stageIdx >= STAGES.length - 1) {
-          setScene("win"); SFX.win();
-          G.selCooldown = 90;   // nobody mashes past the victory screen
-        }
-        else { G.stageIdx++; setScene("stagecard"); }
+          // the run is over: your host's ending, then the shared sign-off
+          startBridge(`ending_${G.player ? G.player.key : "blake"}`, "win");
+          SFX.win();
+        } else if (STAGES[G.stageIdx].heliOutro) {
+          // the owner's helicopter is waiting at center court
+          G.outroT = 0;
+          setScene("outro");
+          musicSet("none");
+        } else { G.stageIdx++; setScene("stagecard"); }
+      }
+      return;
+    case "bridge":
+      if (stepBridge(pressed("attack"))) {
+        const dest = G.bridgeReturn;
+        setScene(dest);
+        if (dest === "win") { SFX.win(); G.selCooldown = 90; }
+      }
+      return;
+    case "outro":
+      if (stepOutro()) {
+        G.stageIdx++;
+        startBridge("shootdown", "stagecard");
       }
       return;
     case "win":
@@ -140,11 +175,16 @@ function update(): void {
     if (G.tick % 2 === 0) return;
   }
 
-  updateWaves();
-
-  // ON AIR gag (stage 1): sign snaps on, everyone freezes and looks
   const stage = STAGES[G.stageIdx];
   const p = G.player;
+
+  if (stage.autoscroll) {
+    updateLimeRide();
+  } else {
+    updateWaves();
+  }
+
+  // ON AIR gag (stage 1): sign snaps on, everyone freezes and looks
   if (stage.onAirX !== undefined && !G.onAirDone && p && p.x > stage.onAirX - 60 && G.enemies.length > 0) {
     G.onAirDone = true; G.onAirT = ENEMY_AI.freezeFrames;
     freezeAllEnemies(ENEMY_AI.freezeFrames, stage.onAirX);
@@ -153,17 +193,59 @@ function update(): void {
   }
   if (G.onAirT > 0) G.onAirT--;
 
+  // KISS CAM (the AAC): the jumbotron freezes everyone mid-brawl
+  if (stage.kissCam) {
+    if (G.kissCamShowT > 0) G.kissCamShowT--;
+    if (G.enemies.length > 0 && G.kissCamShowT === 0) {
+      G.kissCamT--;
+      if (G.kissCamT <= 0) {
+        G.kissCamT = 950;
+        G.kissCamShowT = 80;
+        freezeAllEnemies(60, G.cam + W / 2);
+        SFX.freeze();
+        if (p) floatText(p.x, p.y - 110, pick(LORE.signage.jumbotron), "#e84878", 15, 70);
+      }
+    }
+    // the crowd turns on the front office
+    const patty = G.enemies.find(e => e.kind === "sonInLaw" && e.hp > 0);
+    if (G.chantActiveT > 0) {
+      G.chantActiveT--;
+      if (G.chantActiveT % 60 === 0) {
+        for (const gm of G.enemies) {
+          if (gm.kind === "evilGm" && gm.hp > 0 && gm.state !== "air" && gm.state !== "down") {
+            gm.state = "hurt"; gm.t = 30;   // flinches, drops his guard
+          }
+        }
+      }
+    } else if (patty) {
+      G.chantT--;
+      if (G.chantT <= 0) { G.chantT = 700; G.chantActiveT = 180; }
+    }
+  }
+
   updatePlayer();
   updateEnemies();
   updateProjectiles();
   updateWorldObjects();
-  updateCamera();
+  if (!stage.autoscroll) updateCamera();
+
+  // the secret Angelo send-off queues here, once the dust settles
+  if (G.pendingBridge && G.hitstop === 0 && G.slowmoT === 0) {
+    const seq = G.pendingBridge;
+    G.pendingBridge = null;
+    startBridge(seq, "play");
+    return;
+  }
 
   // stage clear -> sting -> results
   if (G.clearT > 0) {
     G.clearT--;
     if (G.clearT === 0) { setScene("results"); G.selCooldown = 45; }
-  } else if (stageCleared() && p && p.hp > 0) {
+  } else if (stage.autoscroll && limeRideDone() && p && p.hp > 0) {
+    G.clearT = 90;
+    SFX.sting();
+    setBanner(LORE.results.header, null, 100);
+  } else if (!stage.autoscroll && stageCleared() && p && p.hp > 0) {
     G.clearT = 110;
     SFX.sting();
     setBanner(LORE.results.header, null, 100);
@@ -202,6 +284,7 @@ function drawRainTelegraph(): void {
 
 function drawPlayfield(): void {
   drawRainTelegraph();
+  if (STAGES[G.stageIdx].autoscroll) drawLimeHazards();
   G.goos.forEach(drawGooSprite);
 
   interface DrawItem { y: number; fn: () => void; }
@@ -218,7 +301,7 @@ function drawPlayfield(): void {
   G.clouds.forEach(drawCloudSprite);
 
   // GO arrow
-  if (G.enemies.length === 0 && G.scene === "play" && p && p.x < STAGES[G.stageIdx].length - 500 && G.tick % 60 < 40) {
+  if (G.enemies.length === 0 && G.scene === "play" && !STAGES[G.stageIdx].autoscroll && p && p.x < STAGES[G.stageIdx].length - 500 && G.tick % 60 < 40) {
     ctx.fillStyle = "#ffd23f"; ctx.font = "bold 30px monospace"; ctx.textAlign = "right";
     ctx.fillText(LORE.ui.go, W - 30, 120);
   }
@@ -235,6 +318,13 @@ function draw(): void {
     case "howto": drawHowTo(); break;
     case "intro": drawIntro(); break;
     case "stagecard": drawStageCard(); break;
+    case "bridge": drawBridge(); break;
+    case "outro": {
+      drawPlayfield();
+      drawFx();
+      drawOutro();
+      break;
+    }
     default: {
       drawPlayfield();
       drawFx();

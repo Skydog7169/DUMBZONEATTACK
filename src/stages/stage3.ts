@@ -1,19 +1,21 @@
-/* STAGE 3 — THE CASINO PENTHOUSE
-   Elevator ride up (one cramped wave inside), then gold-and-velvet
-   arena. The Matriarch holds the far end. */
+/* STAGE 3 — THE AAC ("hostile home court")
+   Concourse -> players' tunnel -> center court. Kiss-cam freezes,
+   the crowd chants against the front office, and PATTY D. defends
+   home floor. Ends with the owner's helicopter pickup. */
 import type { StageDef } from "../engine/entity";
 import { LORE } from "../lore";
 
 export const stage3: StageDef = {
-  length: 3800,
-  backdrop: 2,
+  length: 3600,
+  backdrop: 4,
   music: 3,
-  elevatorEndX: 760,
+  kissCam: true,
+  heliOutro: true,
   waves: [
-    { at: 380,  spawn: [["lawyer", 2]], banner: LORE.waveBanners.elevator },
-    { at: 1150, spawn: [["pitBoss", 1], ["cardSharp", 2]], banner: LORE.waveBanners.penthouse },
-    { at: 1850, spawn: [["pitBoss", 2], ["lawsuit", 2]], banner: null },
-    { at: 2500, spawn: [["cardSharp", 2], ["pitBoss", 1], ["lawyer", 2]], banner: null },
-    { at: 3250, spawn: [["matriarch", 1]], banner: null }
+    { at: 420,  spawn: [["suit", 2]], banner: LORE.waveBanners.security },
+    { at: 1050, spawn: [["pitBoss", 1], ["lawyer", 2]], banner: null },
+    { at: 1750, spawn: [["suit", 2], ["cardSharp", 1]], banner: null },
+    { at: 2450, spawn: [["pitBoss", 2], ["lawsuit", 2]], banner: null },
+    { at: 3150, spawn: [["sonInLaw", 1]], banner: null }
   ]
 };

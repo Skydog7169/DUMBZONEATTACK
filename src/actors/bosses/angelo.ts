@@ -21,10 +21,15 @@ export function updateAngelo(e: Enemy): void {
   const p2 = e.phase === 2;
   const speed = effSpeed(e) * (p2 ? ENEMY_AI.angeloP2SpeedMul : 1);
 
+  const vsBlake = p.key === "blake";
   if (e.askT > 0) e.askT--;
   else {
     e.askT = p2 ? ENEMY_AI.angeloP2AskCd : ENEMY_AI.angeloAskCd;
-    floatText(e.x, e.y - 108, pick(LORE.angelo.grabLines), "#fff", 15, 120);
+    // he knows who his guy is
+    const line = vsBlake
+      ? (Math.random() < 0.5 ? pick(LORE.angelo.blakeLines) : pick(LORE.angelo.grabLines))
+      : (Math.random() < 0.35 ? LORE.angelo.nonBlakeLine : pick(LORE.angelo.grabLines));
+    floatText(e.x, e.y - 108, line, "#fff", 15, 120);
   }
 
   if (e.state === "windup") {
@@ -32,8 +37,9 @@ export function updateAngelo(e: Enemy): void {
     if (e.t <= 0) {
       const dx = Math.abs(p.x - e.x), dy = Math.abs(p.y - e.y);
       if (dx < ENEMY_AI.angeloReach + 4 && dy < 26 && p.hurtT <= 0) {
-        // the grab: drains you, heals him — he always needs a little more
-        hurtPlayer(e.dmg);
+        // the grab: drains you, heals him — and Blake is his ATM
+        const drain = p.key === "blake" ? Math.round(e.dmg * 1.3) : e.dmg;
+        hurtPlayer(drain);
         e.hp = Math.min(e.maxHp, e.hp + ENEMY_AI.angeloHeal);
         floatText(e.x, e.y - 84, `+${ENEMY_AI.angeloHeal}`, "#67e06b", 14, 40);
       }

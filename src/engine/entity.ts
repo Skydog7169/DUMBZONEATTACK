@@ -75,6 +75,7 @@ export interface Player {
   grabbing: Enemy | null; grabT: number;
   slowT: number;
   armorT: number;
+  attackLockT: number;         // Cat Man's INJUNCTION: attacks on hold, movement fine
   combo: number; comboT: number;
 }
 
@@ -110,15 +111,28 @@ export interface Wave {
 export interface StageDef {
   length: number;
   waves: Wave[];
-  backdrop: 0 | 1 | 2 | 3;     // stage index look
+  backdrop: 0 | 1 | 2 | 3 | 4 | 5 | 6;  // fox4 | downtown | estate | (unused) | aac | lime | cumulus
   music: number;
   onAirX?: number;             // stage 1 gag trigger
-  elevatorEndX?: number;       // stage 3: interior boundary
+  interiorX?: number;          // estate: lawn/interior boundary
+  kissCam?: boolean;           // AAC jumbotron freeze gag
+  autoscroll?: boolean;        // the Lime ride
+  heliOutro?: boolean;         // AAC: helicopter pickup after the boss
+}
+
+/* Lime-ride road hazards */
+export type HazardType = "pothole" | "car" | "dart" | "angelo" | "sign";
+export interface Hazard {
+  type: HazardType;
+  x: number; y: number;
+  t: number;                   // per-hazard anim/trigger timer
+  flag: boolean;               // one-shot state (door opened / damage dealt)
+  variant: number;             // sign index / art seed
 }
 
 export type Scene =
   | "title" | "select" | "howto" | "intro" | "stagecard" | "play"
-  | "results" | "win" | "lose" | "pause";
+  | "results" | "win" | "lose" | "pause" | "bridge" | "outro";
 
 export interface StageStats { damage: number; maxCombo: number; startScore: number; died: boolean; }
 
@@ -147,9 +161,22 @@ export interface GameState {
   introPanel: number;
   stats: StageStats;
   onAirDone: boolean; onAirT: number;
+  onAirLabel: string;          // which ON AIR variant this run got
   slowmoT: number;
   clearT: number;              // countdown after stage cleared before results
   selCooldown: number;
+  /* comic-bridge cutscenes */
+  bridgeSeq: string | null;    // active panel sequence id
+  bridgeIdx: number; bridgeT: number;
+  bridgeReturn: Scene;         // where to go when the sequence ends
+  pendingBridge: string | null;
+  /* scripted outro (the helicopter) */
+  outroT: number;
+  /* AAC events */
+  kissCamT: number; kissCamShowT: number;
+  chantT: number; chantActiveT: number;
+  /* Lime ride */
+  hazards: Hazard[];
 }
 
 export const G: GameState = {
@@ -177,7 +204,16 @@ export const G: GameState = {
   introPanel: 0,
   stats: { damage: 0, maxCombo: 0, startScore: 0, died: false },
   onAirDone: false, onAirT: 0,
+  onAirLabel: "ON AIR",
   slowmoT: 0,
   clearT: 0,
-  selCooldown: 0
+  selCooldown: 0,
+  bridgeSeq: null,
+  bridgeIdx: 0, bridgeT: 0,
+  bridgeReturn: "play",
+  pendingBridge: null,
+  outroT: 0,
+  kissCamT: 600, kissCamShowT: 0,
+  chantT: 500, chantActiveT: 0,
+  hazards: []
 };

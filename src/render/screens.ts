@@ -79,6 +79,38 @@ function drawPanel(i: number, x: number, y: number, w: number, h: number): void 
   ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
 
   if (i === 0) {
+    // the lawsuit he lost: gavel, papers, a verdict he still disputes
+    ctx.fillStyle = "#2c2418"; ctx.fillRect(x, y, w, h);
+    px(x + 40, y + 60, w - 80, 12, "#4a3a24");                  // the bench
+    px(x + w / 2 - 60, y + 90, 120, 80, "#f0ead8");             // the ruling
+    ctx.fillStyle = "#888";
+    for (let l = 0; l < 5; l++) ctx.fillRect(x + w / 2 - 46, y + 104 + l * 12, 92, 3);
+    px(x + w / 2 - 46, y + 152, 46, 6, "#a33");                 // the signature
+    // the gavel, mid-slam
+    ctx.save(); ctx.translate(x + w - 110, y + 90); ctx.rotate(-0.5);
+    px(-8, -34, 16, 34, "#6a4a24");
+    px(-24, -52, 48, 22, "#8a6234");
+    ctx.restore();
+    px(x + w - 150, y + 118, 70, 10, "#4a3a24");
+  } else if (i === 1) {
+    // the house: Miri in shadow, chips in hand
+    ctx.fillStyle = "#160a20"; ctx.fillRect(x, y, w, h);
+    ctx.fillStyle = "rgba(232,198,106,0.10)";
+    ctx.beginPath(); ctx.moveTo(x + w / 2, y); ctx.lineTo(x + w / 2 - 120, y + h); ctx.lineTo(x + w / 2 + 120, y + h); ctx.fill();
+    px(x + w / 2 - 34, y + 78, 68, 120, "#0a0512");             // her silhouette
+    px(x + w / 2 - 24, y + 46, 48, 40, "#0a0512");
+    px(x + w / 2 - 30, y + 42, 60, 14, "#0a0512");              // the hair
+    // the glasses catch what little light there is
+    px(x + w / 2 - 16, y + 62, 12, 8, "#e04858");
+    px(x + w / 2 + 4, y + 62, 12, 8, "#e04858");
+    // chips in hand
+    for (let c = 0; c < 3; c++) {
+      ctx.fillStyle = "#e8c66a";
+      ctx.beginPath(); ctx.arc(x + w / 2 + 56, y + 150 - c * 9, 12, 0, 7); ctx.fill();
+      ctx.fillStyle = "#a8862a";
+      ctx.beginPath(); ctx.arc(x + w / 2 + 56, y + 150 - c * 9, 6, 0, 7); ctx.fill();
+    }
+  } else if (i === 2) {
     // downtown at showtime
     const g = ctx.createLinearGradient(0, y, 0, y + h);
     g.addColorStop(0, "#150b2e"); g.addColorStop(1, "#5b2470");
@@ -90,7 +122,7 @@ function drawPanel(i: number, x: number, y: number, w: number, h: number): void 
     ctx.fillStyle = "#3b1d1d"; ctx.fillRect(x + 140, y + 110, 130, 100);
     ctx.fillStyle = "#ff4f79"; ctx.font = "bold 12px monospace"; ctx.textAlign = "center";
     ctx.fillText(LORE.signage.building, x + 205, y + 132);
-  } else if (i === 1) {
+  } else {
     // the door bursts open
     ctx.fillStyle = "#b9c9b4"; ctx.fillRect(x, y, w, h);
     ctx.fillStyle = "#22201c"; ctx.fillRect(x + w / 2 - 50, y + 40, 100, h);
@@ -105,26 +137,6 @@ function drawPanel(i: number, x: number, y: number, w: number, h: number): void 
     ctx.closePath(); ctx.fill();
     ctx.fillStyle = "#0a0512"; ctx.font = "bold 26px monospace"; ctx.textAlign = "center";
     ctx.fillText(LORE.signage.doorBurst, x + w / 2, y + 118);
-  } else if (i === 2) {
-    // the cat man silhouette
-    ctx.fillStyle = "#31145a"; ctx.fillRect(x, y, w, h);
-    ctx.fillStyle = "#0a0512";
-    px(x + w / 2 - 20, y + 60, 40, 90, "#0a0512");
-    px(x + w / 2 - 14, y + 36, 28, 26, "#0a0512");
-    // glowing cat eyes on his shoulder
-    px(x + w / 2 + 22, y + 52, 12, 10, "#0a0512");
-    ctx.fillStyle = "#7CFC00";
-    ctx.fillRect(x + w / 2 + 24, y + 55, 3, 3); ctx.fillRect(x + w / 2 + 29, y + 55, 3, 3);
-  } else {
-    // dawn, the crew ready
-    const g = ctx.createLinearGradient(0, y, 0, y + h);
-    g.addColorStop(0, "#8e3a6e"); g.addColorStop(1, "#ffb46b");
-    ctx.fillStyle = g; ctx.fillRect(x, y, w, h);
-    const keys: CharKey[] = ["blake", "jake", "dan"];
-    keys.forEach((k, j) => {
-      const pal = CHAR_PAL[k];
-      drawHumanoid(x + 120 + j * 80, y + 175, { face: 1, walk: 0, swing: 0, hurt: false, ...pal, w: 26, h: 56 });
-    });
   }
 
   // caption box

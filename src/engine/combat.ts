@@ -29,7 +29,8 @@ export function hitEnemy(e: Enemy, dmg: number, o: HitOpts): boolean {
   if (e.hp <= 0 || e.state === "down" || e.state === "grabbed") return false;
 
   // THE TRADE — Patty D. throws his Evil GM in to eat the hit.
-  if (e.kind === "sonInLaw" && e.tradeCd === 0 && e.spawnGraceT <= 0) {
+  // (Phase 2 he's fired his own patsy and fights solo — no more trades.)
+  if (e.kind === "sonInLaw" && e.phase === 1 && e.tradeCd === 0 && e.spawnGraceT <= 0) {
     e.tradeCd = ENEMY_AI.silTradeCd;
     const patsy = makeEnemy("evilGm", e.x, e.y);
     patsy.face = e.face;

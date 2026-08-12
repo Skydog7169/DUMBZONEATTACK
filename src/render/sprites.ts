@@ -5,6 +5,7 @@ import type { CharKey } from "../balance";
 import { CHARS } from "../balance";
 import { clamp } from "../engine/util";
 import { LORE } from "../lore";
+import { STAGES } from "../stages";
 
 export function px(x: number, y: number, w: number, h: number, c: string): void {
   ctx.fillStyle = c;
@@ -158,6 +159,17 @@ export function drawHumanoid(sx: number, sy: number, o: HumanoidOpts): void {
 export function drawPlayerSprite(p: Player): void {
   const sx = p.x - G.cam, sy = p.y - p.h;
   const c = CHARS[p.key], pal = CHAR_PAL[p.key];
+  // the Lime, obviously
+  if (STAGES[G.stageIdx]?.autoscroll) {
+    drawShadow(sx, p.y, 20);
+    px(sx - 22, sy - 4, 46, 5, "#3a3a42");                  // deck
+    ctx.fillStyle = "#111";
+    ctx.beginPath(); ctx.arc(sx - 22, sy + 2, 6, 0, 7); ctx.fill();
+    ctx.beginPath(); ctx.arc(sx + 24, sy + 2, 6, 0, 7); ctx.fill();
+    ctx.strokeStyle = "#5adb4a"; ctx.lineWidth = 4;         // lime-green stem
+    ctx.beginPath(); ctx.moveTo(sx + 22, sy - 6); ctx.lineTo(sx + 30, sy - 52); ctx.stroke();
+    px(sx + 22, sy - 56, 16, 5, "#5adb4a");
+  }
   let swing = 0, kick = 0, upper = 0;
   if (p.act) {
     const anim = Math.max(0, p.act.hitAt + 8 - p.act.t);
@@ -324,13 +336,19 @@ export function drawEnemySprite(e: Enemy): void {
         px(sx + e.face * 8 - 2, sy - 42, 5, 3, "#f0ead8");
       }
       break;
-    case "angelo":
+    case "angelo": {
+      // the going-out shirt has seen better days; the posture is immaculate
       drawHumanoid(sx, sy, {
         face: e.face, walk: e.walk, swing: e.swing, hurt,
-        skin: "#d9a878", shirt: "#6b5a3a", pants: "#4a4033", hair: "#4a4a4a",
+        skin: "#d9a878", shirt: "#7a4460", pants: "#4a4033", hair: "#4a4a4a",
         beard: "#5a5a5a", hat: "#3a3226", w: 34, h: 66, shadowAt: e.y
       });
+      // shirt pattern + the one earring
+      px(sx - 8, sy - 44, 3, 16, "#9a5a80");
+      px(sx + 5, sy - 42, 3, 14, "#9a5a80");
+      px(sx - e.face * 11, sy - 55, 2, 4, "#ffd23f");
       break;
+    }
     case "sonInLaw":
       // trade armed = blue shimmer telegraph
       if (e.tradeCd === 0) {
@@ -454,9 +472,13 @@ export function drawProjectileSprite(pr: Projectile): void {
       drawShadow(sx, pr.y, 8);
       break;
     case "pinkSlip":
+      // CEASE & DESIST notice: heavy envelope, red wax seal
       ctx.save(); ctx.translate(sx, sy); ctx.rotate(Math.sin(pr.spin) * 0.5);
-      px(-10, -7, 20, 14, "#ffb3c8");
-      px(-7, -4, 14, 2, "#c76"); px(-7, 0, 10, 2, "#c76");
+      px(-11, -8, 22, 16, "#f0ead8");
+      ctx.strokeStyle = "#b8ae96"; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(-11, -8); ctx.lineTo(0, 2); ctx.lineTo(11, -8); ctx.stroke();
+      ctx.fillStyle = "#a02030";
+      ctx.beginPath(); ctx.arc(0, 2, 4, 0, 7); ctx.fill();
       ctx.restore();
       break;
     case "subpoena":
