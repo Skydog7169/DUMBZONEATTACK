@@ -12,7 +12,7 @@ export const stage6: StageDef = {
     { at: 420,  spawn: [["lawyer", 2], ["lawsuit", 2]], banner: LORE.waveBanners.noFormat },
     { at: 1050, spawn: [["suit", 1], ["processServer", 1], ["cardSharp", 1]], banner: null },
     { at: 1750, spawn: [["lawyer", 2], ["suit", 1], ["lawsuit", 2]], banner: null },
-    { at: 2450, spawn: [["processServer", 2], ["pitBoss", 1]], banner: LORE.waveBanners.terms },
+    { at: 2450, spawn: [["processServer", 1], ["pitBoss", 1]], banner: LORE.waveBanners.terms },
     { at: 3100, spawn: [["catman", 1]], banner: null }
   ]
 };

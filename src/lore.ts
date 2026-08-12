@@ -206,6 +206,17 @@ export const LORE = {
     defeatLine: "there's... a nuance in there..."
   },
 
+  /* ---------------- BOSS ESCAPE MOVES ----------------
+     LORE SLOT: the popup when each boss triggers their defensive move.
+     Combo a boss too hard and they answer in character. */
+  bossEscapes: {
+    seniorPartner: "SIDEBAR!",         // briefcase guard, slides out, answers with a fan
+    angelo: "NOT THE SHIRT!",          // sassy hop-back, then a lunging grab
+    sonInLaw: "SLIPPED THE PICK!",     // ducks straight through you (phase 2 only)
+    matriarch: "HOUSE RULES!",         // vanishes in a burst of chips, glides across the floor
+    catman: "FILED AND SEALED!"        // paper shield, then scoots away on the chair
+  },
+
   /* ---------------- CAMEO ---------------- */
   aubrey: {
     name: "AUBREY",

@@ -44,6 +44,10 @@ export interface Enemy {
   summonCount: number;
   rainT: number; rainStage: number; rainStageT: number; rainGaps: number[];
   diveVx: number; diveVy: number;  // lawsuit committed-dive vector
+  /* boss defense: combo pressure triggers a signature escape */
+  pressure: number; pressureT: number;
+  guardT: number;              // while > 0 the boss blocks incoming hits
+  escapeCd: number;
   spawnGraceT: number;         // brief walk-in period, no attacks
 }
 

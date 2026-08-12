@@ -1,11 +1,11 @@
 /* Damage resolution: blocking, the Son-in-Law's Trade, juggles,
    knockdowns, meter gain, player damage. */
 import { G, type Enemy, type Facing } from "./entity";
-import { COMBAT, METER, JUICE, ENEMY_AI } from "../balance";
+import { COMBAT, METER, JUICE, ENEMY_AI, W } from "../balance";
 import { floatText, spark, comicCard } from "../render/fx";
 import { SFX } from "../audio";
 import { LORE } from "../lore";
-import { pick, rnd } from "./util";
+import { pick, rnd, clamp } from "./util";
 import { makeEnemy } from "./spawner";
 
 export interface HitOpts {
@@ -67,6 +67,14 @@ export function hitEnemy(e: Enemy, dmg: number, o: HitOpts): boolean {
     }
   }
 
+  // boss guard: while their defensive move is up, nothing lands
+  if (isBoss(e) && e.guardT > 0 && !o.grab) {
+    SFX.block();
+    spark(e.x, e.y - 40, "#cfd6e4", 5, 2.5);
+    floatText(e.x, e.y - 80, LORE.ui.blocked, "#cfd6e4", 14, 26);
+    return false;
+  }
+
   // damage multipliers
   let mult = 1;
   if (e.state === "air") mult *= COMBAT.airDmgMul;
@@ -103,6 +111,9 @@ export function hitEnemy(e: Enemy, dmg: number, o: HitOpts): boolean {
     // bosses: flinch but never launch or fall
     e.state = "hurt"; e.t = 8;
     e.x += o.dir * (o.kb ?? 6) * 0.4;
+    // combo pressure: a full chain is free — SUSTAINED pressure gets answered
+    e.pressure++; e.pressureT = 110;
+    if (e.pressure >= 5 && e.escapeCd <= 0 && e.hp > 0) triggerBossEscape(e);
   } else if (o.fling) {
     e.state = "air"; e.h = Math.max(e.h, 2); e.vh = 4.5;
     e.vx = o.dir * o.fling;
@@ -147,6 +158,65 @@ export function hurtPlayer(dmg: number, opts?: { noStagger?: boolean }): void {
     }
   }
   if (p.hp <= 0) { p.hp = 0; }
+}
+
+/* ---- boss escapes: block, slip, or vanish — then answer in character ---- */
+function triggerBossEscape(e: Enemy): void {
+  const p = G.player;
+  const away: Facing = p && p.x > e.x ? -1 : 1;
+  const lo = G.cam + 60, hi = G.cam + W - 60;
+  e.pressure = 0;
+  const pops = LORE.bossEscapes;
+
+  switch (e.kind) {
+    case "seniorPartner":
+      // SIDEBAR: briefcase up, slide out of the scrum, answer with a fan
+      e.guardT = 55; e.escapeCd = 300;
+      e.state = "recover"; e.t = 55;
+      e.x = clamp(e.x + away * 150, lo, hi);
+      e.fireT = 40;
+      floatText(e.x, e.y - 96, pops.seniorPartner, "#e8d48a", 15, 60);
+      break;
+    case "angelo":
+      // the hop-back — protect the shirt — then a lunging grab
+      e.guardT = 20; e.escapeCd = 260;
+      e.state = "recover"; e.t = 26;
+      e.x = clamp(e.x + away * 130, lo, hi);
+      e.atkT = 20;
+      floatText(e.x, e.y - 96, pops.angelo, "#e0b8d0", 15, 60);
+      break;
+    case "sonInLaw":
+      if (e.phase < 2) return;   // phase 1's defense IS the Trade
+      // slips straight through you, instant counter
+      e.guardT = 14; e.escapeCd = 240;
+      e.state = "recover"; e.t = 16;
+      if (p) e.x = clamp(2 * p.x - e.x + (p.x > e.x ? 60 : -60), lo, hi);
+      e.atkT = 10;
+      floatText(e.x, e.y - 96, pops.sonInLaw, "#9ec7f0", 15, 60);
+      break;
+    case "matriarch":
+      // HOUSE RULES: gone in a burst of chips, reappears across the floor
+      e.guardT = 28; e.escapeCd = 300;
+      e.state = "recover"; e.t = 30;
+      spark(e.x, e.y - 40, "#e8c66a", 16, 5);
+      e.x = clamp(2 * (G.cam + W / 2) - e.x, lo + 40, hi - 40);
+      spark(e.x, e.y - 40, "#e8c66a", 16, 5);
+      e.throwT = 26;
+      floatText(e.x, e.y - 96, pops.matriarch, "#e8c66a", 15, 60);
+      break;
+    case "catman":
+      // the paper shield, then the chair scoot
+      e.guardT = 55; e.escapeCd = 460;
+      e.state = "recover"; e.t = 55;
+      e.x = clamp(e.x + away * 170, lo, hi);
+      e.throwT = 46;
+      floatText(e.x, e.y - 96, pops.catman, "#ff9dc0", 15, 60);
+      break;
+    default:
+      return;
+  }
+  SFX.dash();
+  G.shake = Math.max(G.shake, 3);
 }
 
 export function releaseGrab(e: Enemy): void {

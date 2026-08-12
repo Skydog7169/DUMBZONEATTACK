@@ -326,7 +326,8 @@ export function drawEnemySprite(e: Enemy): void {
     case "seniorPartner":
       // silver hair, pinstripe navy, gold tie, briefcase — the closer
       drawHumanoid(sx, sy, {
-        face: e.face, walk: e.walk, swing: e.swing, hurt, brief: true,
+        face: e.face, walk: e.walk, swing: e.swing, hurt, brief: e.guardT <= 0,
+        block: e.guardT > 0,
         skin: "#e2b494", shirt: "#1e2a4a", pants: "#16203a", hair: "#c8c8cc",
         tie: "#c9a227", w: 32, h: 64, shadowAt: e.y
       });
@@ -364,6 +365,11 @@ export function drawEnemySprite(e: Enemy): void {
       });
       break;
     case "matriarch":
+      // mid-glide she's more chips than person
+      if (e.guardT > 0) {
+        ctx.globalAlpha = 0.45;
+        if (G.tick % 4 < 2) px(sx + (G.tick % 3) * 8 - 8, sy - 30 - (G.tick % 5) * 6, 6, 6, "#e8c66a");
+      }
       // long blond hair, bangs, big red-tinted glasses
       drawHumanoid(sx, sy, {
         face: e.face, walk: e.walk, swing: e.swing, hurt,
@@ -387,6 +393,17 @@ export function drawEnemySprite(e: Enemy): void {
         px(sx + e.face * 26 - 10, sy - 40, 20, 26, "#2c2c34");
         px(sx + e.face * 26 - 12, sy - 16, 24, 4, "#44444e");
         px(sx + e.face * 26 - 2, sy - 12, 4, 10, "#44444e");
+      }
+      // FILED AND SEALED: a swirl of paperwork deflects everything
+      if (e.guardT > 0) {
+        for (let pp = 0; pp < 3; pp++) {
+          const ang = G.tick * 0.25 + pp * 2.1;
+          const ox = Math.cos(ang) * 30, oy = Math.sin(ang) * 12;
+          ctx.save(); ctx.translate(sx + ox, sy - 40 + oy); ctx.rotate(ang * 0.5);
+          px(-7, -9, 14, 18, "#f0ead8");
+          px(-4, -5, 8, 2, "#a33");
+          ctx.restore();
+        }
       }
       break;
   }

@@ -46,6 +46,9 @@ export function updateEnemies(): void {
     if (e.slowT > 0) e.slowT--;
     if (e.tradeCd > 0) e.tradeCd--;
     if (e.swing > 0) e.swing--;
+    if (e.guardT > 0) e.guardT--;
+    if (e.escapeCd > 0) e.escapeCd--;
+    if (e.pressureT > 0) { e.pressureT--; if (e.pressureT === 0) e.pressure = 0; }
 
     /* gas cloud: DoT, cough-stagger on entry, halved attack rate
        (attack cadence halving is done by re-incrementing timers

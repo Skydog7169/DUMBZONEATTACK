@@ -89,8 +89,8 @@ export const ENEMY: Record<EnemyKind, EnemyStats> = {
   seniorPartner: { hp: 260, dmg: 11, speed: 1.4, score: 1500 },
   angelo:        { hp: 280, dmg: 12, speed: 1.25, score: 1500 },
   sonInLaw:      { hp: 320, dmg: 13, speed: 2.6, score: 2500 },
-  matriarch:     { hp: 320, dmg: 10, speed: 0.8, score: 3500 },
-  catman:        { hp: 480, dmg: 12, speed: 1.6, score: 5000 }
+  matriarch:     { hp: 290, dmg: 10, speed: 0.8, score: 3500 },
+  catman:        { hp: 430, dmg: 12, speed: 1.6, score: 5000 }
 };
 
 export const ENEMY_AI = {

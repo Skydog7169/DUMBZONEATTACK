@@ -34,6 +34,7 @@ export function makeEnemy(kind: EnemyKind, x: number, y?: number): Enemy {
     summonCount: 0,
     rainT: 340, rainStage: 0, rainStageT: 0, rainGaps: [],
     diveVx: 0, diveVy: 0,
+    pressure: 0, pressureT: 0, guardT: 0, escapeCd: 120,
     spawnGraceT: 30
   };
 }

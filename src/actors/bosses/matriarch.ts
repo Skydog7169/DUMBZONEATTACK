@@ -81,8 +81,18 @@ export function updateMatriarch(e: Enemy): void {
     e.dashT = 1;
   }
 
-  // she keeps her distance — but the house never leaves the floor
-  if (dist < 170) { e.x = clamp(e.x - sign(dx) * effSpeed(e), G.cam + 46, G.cam + W - 46); e.walk += 0.15; }
+  // she keeps her distance — but never wedges herself against the wall.
+  // out of room = shift lanes instead; real pressure triggers HOUSE RULES.
+  if (dist < 170) {
+    const retreatX = e.x - sign(dx) * effSpeed(e);
+    const cornered = retreatX <= G.cam + 90 || retreatX >= G.cam + W - 90;
+    if (!cornered) {
+      e.x = retreatX; e.walk += 0.15;
+    } else {
+      const laneY = p.y > 430 ? 380 : 490;
+      moveToward(e, e.x, laneY, effSpeed(e) * 1.1);
+    }
+  }
   else if (Math.abs(p.y - e.y) > 24) moveToward(e, e.x, p.y, effSpeed(e) * 0.7);
 
   // lobbed exploding poker chip (only while on the floor, no off-screen sniping)
